@@ -1,0 +1,26 @@
+@model IntraPortal.Models.Notice
+@{
+  ViewData["Title"] = "新規投稿";
+}
+<h5>新規投稿</h5>
+<form method="post">
+  <div class="mb-2">
+    <label class="form-label">タイトル</label>
+    <input asp-for="Title" class="form-control" maxlength="80" required />
+  </div>
+  <div class="mb-2">
+    <label class="form-label">本文</label>
+    <textarea asp-for="Body" class="form-control" maxlength="2000" rows="6" required></textarea>
+  </div>
+  <div class="mb-2">
+    <label class="form-label">作成者</label>
+    <input asp-for="Author" class="form-control" required />
+  </div>
+  <div class="mb-2">
+    <label class="form-label">添付URL（任意）</label>
+    <input asp-for="FileUrl" class="form-control" />
+  </div>
+  <button class="btn btn-primary">投稿</button>
+  <a class="btn btn-secondary" href="/Notices">戻る</a>
+</form>
+

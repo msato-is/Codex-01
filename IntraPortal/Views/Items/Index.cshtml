@@ -1,0 +1,62 @@
+@model List<IntraPortal.Models.Item>
+@{
+  ViewData["Title"] = "備品在庫＆申請";
+  var recent = (IEnumerable<IntraPortal.Models.ItemRequest>)ViewBag.Recent;
+}
+
+<div class="row g-3">
+  <div class="col-md-7">
+    <h5>在庫一覧</h5>
+    <table class="table table-sm">
+      <thead><tr><th>品目</th><th>在庫</th><th>保管場所</th><th>管理者</th><th></th></tr></thead>
+      <tbody>
+      @foreach (var it in Model){
+        <tr>
+          <td>@it.Name</td>
+          <td>@it.Stock</td>
+          <td>@it.Location</td>
+          <td>@it.Manager</td>
+          <td><button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#reqModal" data-id="@it.Id" data-name="@it.Name" data-stock="@it.Stock">申請</button></td>
+        </tr>
+      }
+      </tbody>
+    </table>
+  </div>
+  <div class="col-md-5">
+    <h5>最近の申請</h5>
+    <ul class="list-group">
+      @foreach (var r in recent){
+        <li class="list-group-item small">[@r.RequestedAt:yyyy/MM/dd HH:mm] @r.Item?.Name x @r.Quantity (@r.RequestedBy)</li>
+      }
+    </ul>
+  </div>
+</div>
+
+<div class="modal fade" id="reqModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">備品申請</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+      <form method="post" asp-action="SubmitRequest">
+        <div class="modal-body">
+          <input type="hidden" name="ItemId" id="req-itemId" />
+          <div class="mb-2"><label class="form-label">品目</label><input id="req-name" class="form-control" disabled /></div>
+          <div class="mb-2"><label class="form-label">在庫</label><input id="req-stock" class="form-control" disabled /></div>
+          <div class="mb-2"><label class="form-label">数量</label><input name="Quantity" type="number" min="1" max="99" class="form-control" required /></div>
+          <div class="mb-2"><label class="form-label">用途（任意）</label><input name="Purpose" class="form-control" /></div>
+          <div class="mb-2"><label class="form-label">希望日（=申請日時）</label><input class="form-control" value="@DateTime.Now:yyyy/MM/dd" disabled /></div>
+          <div class="mb-2"><label class="form-label">申請者</label><input name="RequestedBy" class="form-control" required /></div>
+        </div>
+        <div class="modal-footer"><button class="btn btn-primary">保存</button></div>
+      </form>
+    </div>
+  </div>
+  <script>
+    const reqModal = document.getElementById('reqModal');
+    reqModal.addEventListener('show.bs.modal', (e)=>{
+      const btn = e.relatedTarget; if(!btn) return;
+      document.getElementById('req-itemId').value = btn.getAttribute('data-id');
+      document.getElementById('req-name').value = btn.getAttribute('data-name');
+      document.getElementById('req-stock').value = btn.getAttribute('data-stock');
+    });
+  </script>
+</div>

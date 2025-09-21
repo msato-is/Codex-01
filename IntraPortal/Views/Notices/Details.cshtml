@@ -1,0 +1,13 @@
+@model IntraPortal.Models.Notice
+@{
+  ViewData["Title"] = "お知らせ詳細";
+}
+<h5>@Model.Title</h5>
+<div class="text-muted">@Model.Author ・ @Model.CreatedAt:yyyy/MM/dd HH:mm</div>
+@if (!string.IsNullOrWhiteSpace(Model.FileUrl)){
+  <div class="mt-2">添付: <a href="@Model.FileUrl" target="_blank">@Model.FileUrl</a></div>
+}
+<hr />
+<div>@Model.Body</div>
+<a class="btn btn-secondary mt-3" href="/Notices">一覧</a>
+

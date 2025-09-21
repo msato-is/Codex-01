@@ -1,0 +1,31 @@
+@{
+  ViewData["Title"] = "お弁当注文";
+  var menus = (IEnumerable<IntraPortal.Models.LunchMenu>)ViewBag.Menus;
+  bool accepting = (bool)ViewBag.Accepting;
+}
+
+<h5>今日のメニュー</h5>
+<form method="post" asp-action="Order" class="row g-2 align-items-end">
+  <div class="col-md-3">
+    <label class="form-label">氏名</label>
+    <input name="employeeName" class="form-control" required />
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">メニュー</label>
+    <select name="menuId" class="form-select">
+      @foreach (var m in menus){ <option value="@m.Id">@m.Code: @m.Name (@m.Price 円)</option> }
+    </select>
+  </div>
+  <div class="col-md-2">
+    <label class="form-label">個数</label>
+    <input name="quantity" type="number" min="1" max="10" value="1" class="form-control" />
+  </div>
+  <div class="col-md-2">
+    <button class="btn btn-primary" @(accepting?null:"disabled")>注文</button>
+  </div>
+  <div class="col-md-2">
+    <a class="btn btn-outline-secondary" href="/Lunch/Summary">集計</a>
+  </div>
+</form>
+@if (!accepting){ <div class="text-danger mt-2">受付時間外です（00:00–11:00）。デモは環境変数 LUNCH_ORDER_DEMO=true で緩和可。</div> }
+

@@ -1,0 +1,83 @@
+@model List<IntraPortal.Models.Employee>
+@{
+  ViewData["Title"] = "社員連絡先検索";
+  var q = ViewBag.Query as string;
+  var departments = (IEnumerable<string>)ViewBag.Departments;
+  string? dept = ViewBag.SelectedDept as string;
+  int page = ViewBag.Page; int total = ViewBag.Total; int pageSize = ViewBag.PageSize; string sort = ViewBag.Sort; string dir = ViewBag.Dir;
+  int pages = (int)Math.Ceiling((double)total / pageSize);
+}
+<form method="get" class="row g-2 align-items-end mb-3">
+  <div class="col-md-5">
+    <label class="form-label">氏名（部分一致）</label>
+    <input name="q" value="@q" maxlength="50" class="form-control" />
+  </div>
+  <div class="col-md-4">
+    <label class="form-label">部署</label>
+    <select name="dept" class="form-select">
+      <option value="">（すべて）</option>
+      @foreach (var d in departments){
+        <option value="@d" selected="@(d==dept)">@d</option>
+      }
+    </select>
+  </div>
+  <div class="col-md-3">
+    <button class="btn btn-primary">検索</button>
+  </div>
+  <div class="text-muted">@total 件</div>
+</form>
+
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th><a href='@($"?q={q}&dept={dept}&sort=name&dir={(sort=="name"&&dir=="asc"?"desc":"asc")}")'>氏名</a></th>
+      <th><a href='@($"?q={q}&dept={dept}&sort=dept&dir={(sort=="dept"&&dir=="asc"?"desc":"asc")}")'>部署</a></th>
+      <th>内線</th>
+      <th>メール</th>
+    </tr>
+  </thead>
+  <tbody>
+    @foreach (var e in Model){
+      <tr data-bs-toggle="modal" data-bs-target="#empModal" data-id="@e.Id" style="cursor:pointer">
+        <td>@e.Name</td>
+        <td>@e.Department</td>
+        <td>@e.Ext</td>
+        <td>@e.Email</td>
+      </tr>
+    }
+  </tbody>
+</table>
+
+<nav>
+  <ul class="pagination">
+    @for (var i = 1; i <= pages; i++){
+      <li class="page-item @(i==page?"active":"")"><a class="page-link" href='@($"?q={q}&dept={dept}&sort={sort}&dir={dir}&page={i}")'>@i</a></li>
+    }
+  </ul>
+  <div class="text-muted">ページ @(page) / @pages</div>
+  <div class="text-danger">@Html.ValidationSummary()</div>
+  
+</nav>
+
+<div class="modal fade" id="empModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">プロフィール</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body"><div id="empBody" class="small text-muted">読み込み中...</div></div>
+    </div>
+  </div>
+  <script>
+    const modal = document.getElementById('empModal');
+    modal.addEventListener('show.bs.modal', async (ev)=>{
+      const id = ev.relatedTarget?.getAttribute('data-id');
+      const body = document.getElementById('empBody');
+      body.textContent = '読み込み中...';
+      const res = await fetch(`/Employees/${id}`);
+      const e = await res.json();
+      body.innerHTML = `<div><strong>氏名:</strong> ${e.name}</div>
+                        <div><strong>部署:</strong> ${e.department}</div>
+                        <div><strong>内線:</strong> ${e.ext ?? ''}</div>
+                        <div><strong>メール:</strong> ${e.email ?? ''}</div>`;
+    });
+  </script>
+</div>

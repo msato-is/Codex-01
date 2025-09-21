@@ -1,0 +1,22 @@
+@model IEnumerable<IntraPortal.Controllers.NoticesController.NoticeListVm>
+@{
+  ViewData["Title"] = "お知らせ";
+}
+<div class="d-flex justify-content-between align-items-center mb-2">
+  <h5>お知らせ一覧</h5>
+  <a class="btn btn-primary" href="/Notices/Create">新規投稿</a>
+</div>
+<table class="table table-hover">
+  <thead><tr><th>タイトル</th><th>作成者</th><th>日時</th><th>既読</th></tr></thead>
+  <tbody>
+  @foreach (var n in Model){
+    <tr onclick="location.href='/Notices/Details/@n.Id'" style="cursor:pointer">
+      <td>@n.Title</td>
+      <td>@n.Author</td>
+      <td>@n.CreatedAt:yyyy/MM/dd HH:mm</td>
+      <td>@n.ReadCount</td>
+    </tr>
+  }
+  </tbody>
+  </table>
+
